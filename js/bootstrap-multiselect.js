@@ -365,10 +365,12 @@
 
                 if (isSelectAllOption) {
                     if (checked) {
+                        $("ul > li > ul").show();
                         this.selectall();
                     }
                     else {
                         this.deselectall();
+                        $("ul > li > ul").hide();
                     }
                 }
 

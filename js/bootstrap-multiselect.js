@@ -223,14 +223,15 @@
             preventInputChangeEvent: false,
             nonSelectedText: 'None selected',
             nSelectedText: 'selected',
-            numberDisplayed: 3,
+            numberDisplayed: 1,
             templates: {
                 button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"></button>',
-                ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+                ul: '<ul id="menu" class="multiselect-container dropdown-menu"></ul>',
+                ulGroup: '<ul id="" class=""></ul>',
                 filter: '<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
                 li: '<li><a href="javascript:void(0);"><label></label></a></li>',
                 divider: '<li class="multiselect-item divider"></li>',
-                liGroup: '<li class="multiselect-item group"><label class="multiselect-group"></label></li>'
+                liGroup: '<li class="multiselect-item group"><a class="optgroup" data-parent="#menu" href="#"><label class="multiselect-group"></label></a></li>'
             }
         },
 
@@ -328,7 +329,7 @@
                         this.createDivider();
                     }
                     else {
-                        this.createOptionValue(element);
+                        this.createOptionValue(element, "");
                     }
 
                 }
@@ -505,13 +506,14 @@
          * 
          * @param {jQuery} element
          */
-        createOptionValue: function(element) {
+        createOptionValue: function(element, group) {
             if ($(element).is(':selected')) {
                 $(element).prop('selected', true);
             }
 
             // Support the label attribute on options.
             var label = this.options.label(element);
+            var parentLabel = $(element).parent().attr("label");
             var value = $(element).val();
             var inputType = this.options.multiple ? "checkbox" : "radio";
 
@@ -531,7 +533,11 @@
 
             $('label', $li).append(" " + label);
 
-            this.$ul.append($li);
+            if (group != "") {
+                group.append($li);
+            } else {
+                this.$ul.append($li);
+            }
 
             if ($(element).is(':disabled')) {
                 $checkbox.attr('disabled', 'disabled')
@@ -548,6 +554,8 @@
                 $checkbox.parents('li')
                     .addClass(this.options.selectedClass);
             }
+
+            $li.addClass(parentLabel);
         },
 
         /**
@@ -570,6 +578,7 @@
 
             // Add a header for the group.
             var $li = $(this.options.templates.liGroup);
+            $('a', $li).attr('href', "#"+groupName.replace(/\s+/g, ''));
             $('label', $li).text(groupName);
 
             this.$ul.append($li);
@@ -579,8 +588,12 @@
             }
 
             // Add the options of the group.
+            var $ulGroup = $(this.options.templates.ulGroup);
+            $ulGroup.attr('id', groupName.replace(/\s+/g, ''));
+            $li.append($ulGroup);
+
             $('option', group).each($.proxy(function(index, element) {
-                this.createOptionValue(element);
+                this.createOptionValue(element, $ulGroup);
             }, this));
         },
 

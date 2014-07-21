@@ -688,6 +688,7 @@
 
                                         if (showElement) {
                                             $(element).show().removeClass("filter-hidden");
+                                            $(element).parent().show();
                                         }
                                         else {
                                             $(element).hide().addClass("filter-hidden");
